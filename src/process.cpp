@@ -18,10 +18,8 @@ int Process::Pid() { return pid; }
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() {
     long activejiffies = LinuxParser::ActiveJiffies(pid);
-    //std::cout << LinuxParser::UpTime(pid)  << std::endl;
-    float uptime = (float)LinuxParser::UpTime() - (float)LinuxParser::UpTime(pid);
-    // std::cout << "pid:" << LinuxParser::UpTime(pid)  << std::endl;
-    // std::cout << "system:" << LinuxParser::UpTime()  << std::endl;
+    float uptime = (float)LinuxParser::UpTime(pid);
+
     float utilization = 0.0;
     try{
       utilization = float(activejiffies)/sysconf(_SC_CLK_TCK) / uptime;
@@ -40,11 +38,12 @@ string Process::Ram() { return LinuxParser::Ram(pid); }
 string Process::User() { return LinuxParser::User(pid); }
 
 // TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { return LinuxParser::UpTime() - LinuxParser::UpTime(pid); }
+long int Process::UpTime() {  LinuxParser::UpTime(pid); }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
 bool Process::operator<(Process const& a) const { 
-    //if(this->pid < a->Pid())
-      return true; 
+    //return (this->pid < a->Pid());
+    return true;
+ 
 }

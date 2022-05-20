@@ -107,9 +107,8 @@ long LinuxParser::UpTime() {
     linestream >> value1 >> value2;
     uptime = stoi(value1);
   }
-  //std::cout << uptime << std::endl;
-  //std::cout << uptime  / sysconf(_SC_CLK_TCK) << std::endl;
-  return uptime / sysconf(_SC_CLK_TCK); 
+
+  return uptime;  // in seconds
 }
 
 // TODO: Read and return the number of jiffies for the system
@@ -129,7 +128,7 @@ long LinuxParser::Jiffies() {
 long LinuxParser::ActiveJiffies(int pid) { 
   string line;
   string key;
-  int utime, stime, cutime, cstime, starttime;
+  int utime, stime, cutime, cstime;
   int i=0;
   std::ifstream stream(kProcDirectory + to_string(pid) + kStatFilename);
   if (stream.is_open()) {
@@ -238,7 +237,7 @@ string LinuxParser::Ram(int pid) {
       while(linestream >> key) {
         if (key=="VmSize:") {
           linestream >> value;
-          int res = stoi(value) * 0.001;
+          int res = stoi(value) / 1024;
           return to_string(res);
         }
       }
@@ -302,8 +301,9 @@ long LinuxParser::UpTime(int pid) {
     while (linestream >> key) {
       i += 1;
       if (i==22) {
-        int key_value = stoi(key);
-        return key_value / sysconf(_SC_CLK_TCK); 
+        int start_time = stoi(key) / sysconf(_SC_CLK_TCK); // values in jiffies, convert it to seconds.
+        long uptime = UpTime() - start_time;
+        return uptime;
       }
     }
   }
