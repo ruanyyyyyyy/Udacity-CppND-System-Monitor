@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <experimental/filesystem>
+
 
 #include "linux_parser.h"
 
@@ -11,6 +13,8 @@ using std::stoi;
 using std::string;
 using std::to_string;
 using std::vector;
+
+namespace fs = std::experimental::filesystem;
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
@@ -49,7 +53,7 @@ string LinuxParser::Kernel() {
 }
 
 // BONUS: Update this to use std::filesystem
-vector<int> LinuxParser::Pids() {
+/*vector<int> LinuxParser::Pids() {
   vector<int> pids;
   DIR* directory = opendir(kProcDirectory.c_str());
   struct dirent* file;
@@ -66,6 +70,22 @@ vector<int> LinuxParser::Pids() {
   }
   closedir(directory);
   return pids;
+} */
+
+vector<int> LinuxParser::Pids() {
+  const fs::path sandbox{kProcDirectory};
+    std::vector<int> pids;
+
+    // Iterate over the `std::filesystem::directory_entry` elements
+    for (auto const& dir_entry : fs::directory_iterator{sandbox})
+    {
+        std::string filename = dir_entry.path().stem().string();
+        if (std::all_of(filename.begin(), filename.end(), isdigit)) {
+            int pid = stoi(filename);
+            pids.push_back(pid);
+        }
+    }
+    return pids;
 }
 
 // TODO: Read and return the system memory utilization
