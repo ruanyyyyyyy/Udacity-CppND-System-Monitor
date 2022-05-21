@@ -16,7 +16,7 @@ using std::vector;
 int Process::Pid() { return pid; }
 
 // TODO: Return this process's CPU utilization
-float Process::CpuUtilization() {
+float Process::CpuUtilization() const {
     long activejiffies = LinuxParser::ActiveJiffies(pid);
     float uptime = (float)LinuxParser::UpTime(pid);
 
@@ -38,12 +38,12 @@ string Process::Ram() { return LinuxParser::Ram(pid); }
 string Process::User() { return LinuxParser::User(pid); }
 
 // TODO: Return the age of this process (in seconds)
-long int Process::UpTime() {  LinuxParser::UpTime(pid); }
+long int Process::UpTime() {  return LinuxParser::UpTime(pid); }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
 bool Process::operator<(Process const& a) const { 
-    //return (this->pid < a->Pid());
-    return true;
- 
+    //return a.cpu_util < cpu_util;
+    return this->CpuUtilization() < a.CpuUtilization();
+    // return true;
 }
